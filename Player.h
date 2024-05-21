@@ -5,9 +5,10 @@
 
 class Player{
 protected:
-    squareState pieceColor;
+    Owner color;
+    CheckersBoard& board;
 public:
-    Player(squareState color) : pieceColor(color) {}
+    Player(Owner color, CheckersBoard& board) : color(color), board(board) {}
     virtual ~Player() {}
     virtual void makeMove(CheckersBoard& board) = 0;
 };

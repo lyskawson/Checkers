@@ -4,10 +4,14 @@
 
 int main()
 {
+    CheckersBoard board;
     PlayerType whiteType = PlayerType::Human;
-    PlayerType blackType = PlayerType::Computer;
-    CheckersBoard board1;
-    board1.displayBoard();
+    PlayerType blackType = PlayerType::Human;
+
+    Controller controller(board, whiteType, blackType);
+    controller.playGame();
+
+
 
     return 0;
 }

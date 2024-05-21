@@ -2,10 +2,12 @@
 #define CHECKERS_COMPUTERPLAYER_H
 #include "Player.h"
 
-class ComputerPlayer : public Player {
+class ComputerPlayer : public Player
+        {
 public:
-    ComputerPlayer(squareState color);
+    ComputerPlayer(Owner color, CheckersBoard& board) : Player(color, board) {}
     void makeMove(CheckersBoard& board) override;
+    bool isHuman() const;
 
 };
 

@@ -1,39 +1,35 @@
 #include "Controller.h"
+#include "CheckersBoard.h"
 
 Controller::Controller(CheckersBoard& board, PlayerType whiteType, PlayerType blackType) : board(board)
 {
-        whitePlayer = createPlayer(whiteType, squareState::whiteMan);
-        blackPlayer = createPlayer(blackType, squareState::blackMan);
+        whitePlayer = createPlayer(whiteType, Owner::WHITE);
+        blackPlayer = createPlayer(blackType, Owner::BLACK);
 }
 
 
 
-std::unique_ptr<Player> Controller::createPlayer(PlayerType type, squareState color)
+std::unique_ptr<Player> Controller::createPlayer(PlayerType type, Owner color)
 {
     if (type == PlayerType::Human)
     {
-        return std::make_unique<HumanPlayer>(color);
+        return std::make_unique<HumanPlayer>(color, board);
     } else
     {
-        return std::make_unique<ComputerPlayer>(color);
+        return std::make_unique<ComputerPlayer>(color, board);
     }
 }
 
-void Controller::playGame() {
-    while (!board.isGameOver())
+
+
+void Controller::playGame()
+{
+    while (1)
     {
         board.displayBoard();
         blackPlayer->makeMove(board);
-        if (board.isGameOver()) {
-            std::cout << "Game over!" << std::endl;
-            break;  // If the game ends after Black's move, exit the loop
-        }
-
         board.displayBoard();
         whitePlayer->makeMove(board);
-        if (board.isGameOver()) {
-            std::cout << "Game over!" << std::endl;
-            break;
-        }
     }
+
 }

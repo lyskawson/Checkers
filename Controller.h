@@ -18,7 +18,8 @@ private:
     std::unique_ptr<Player> blackPlayer;
 public:
     Controller(CheckersBoard& board, PlayerType whiteType, PlayerType blackType);
-    std::unique_ptr<Player> createPlayer(PlayerType type, squareState color);
+    std::unique_ptr<Player> createPlayer(PlayerType type, Owner color);
+
 
     void playGame();
 };

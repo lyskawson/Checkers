@@ -1,52 +1,46 @@
 #include "HumanPlayer.h"
 
-HumanPlayer::HumanPlayer(squareState color) : Player(color)
-{
 
-}
 
-void HumanPlayer::makeMove(CheckersBoard& board)
-{
-    int x1, y1, x2, y2;
+void HumanPlayer::makeMove(CheckersBoard& board) {
+    int from, to;
     bool validMoveMade = false;
 
-    while (!validMoveMade)
-    {
-        std::cout << "Enter your move (format: x1 y1 x2 y2): ";
-        if (!(std::cin >> x1 >> y1 >> x2 >> y2))
-        {
+    while (!validMoveMade) {
+        std::cout << "Enter your move (format: from to, where positions range from 1 to 32): ";
+        if (!(std::cin >> from >> to)) {
             std::cout << "Invalid input. Please enter numbers.\n";
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
         }
 
-        if (board.hasMandatoryCapture(x1, y1) && !board.isCaptureMove(x1, y1, x2, y2))
+
+
+        if (from < 0 || from >= 32 || to < 0 || to >= 32)
         {
-            std::cout << "A capture move is mandatory. You must capture.\n";
+            std::cout << "Positions must be between 1 and 32.\n";
             continue;
         }
 
+        int CAPTURE = (abs(board.getVer(from) - board.getVer(to)) == 2 && abs(board.getHor(from) - board.getHor(to)) == 2) ? 1 : 0;
 
-        if (!board.isLegalMove(x1, y1, x2, y2))
+        int moveResult = board.makeMove(color, from, to, CAPTURE);
+        if (moveResult != 0)
         {
-            std::cout << "Illegal move. Please try again.\n";
+            std::cout << "Illegal move. Error code: " << moveResult << ". Please try again.\n";
             continue;
         }
 
-
-        board.executeMove(x1, y1, x2, y2);  // This function needs to handle capturing and king promotion
-
-
-        if (board.canContinueCapture(x2, y2))
+        // Check for additional captures
+        if (CAPTURE == 1 && board.canCapture(to))
         {
             std::cout << "You must continue capturing:\n";
-            continue;  // The player must keep moving the same piece if more captures are possible
+            continue;
         }
 
         validMoveMade = true;
     }
-
 }
 
 bool HumanPlayer::isHuman() const
