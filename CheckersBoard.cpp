@@ -1,4 +1,6 @@
 #include "CheckersBoard.h"
+#include <iomanip>
+
 
 CheckersBoard::CheckersBoard()
 {
@@ -8,6 +10,15 @@ CheckersBoard::CheckersBoard()
 
 void CheckersBoard::restartBoard()
 {
+    /*BLACK_M = 51,
+    WHITE_M = 52,
+    BLACK_K = 53,
+    WHITE_K = 54,
+    EMPTY_F = 55,
+    INVALID = 56,
+    OUTSIDE = 57
+    valid fields are numerated from 1 to 32 and invalid fields are numerated from -2 to -1*/
+
     board = { { 57, 57, 57, 57, 57, 57, 57, 57, 57, 57 },
               { 57, 56, 51, 56, 51, 56, 51, 56, 51, 57 },
               { 57, 51, 56, 51, 56, 51, 56, 51, 56, 57 },
@@ -49,16 +60,26 @@ void CheckersBoard::displayBoard() const
     }
 }
 
-bool CheckersBoard::isGameOver(int player) const
-{
-    int i, count=0, content;
-    for (i=1; i<=32; ++i)
+bool CheckersBoard::isGameOver(int player) const {
+    int i, count = 0, content;
+    bool is_stuck = true;
+    for (i = 1; i <= 32; ++i)
     {
-        content=board[ver[i]][hor[i]];
-        if (isPiece(content) && (getOwner(content)==player))
+        content = board[ver[i]][hor[i]];
+        if (isPiece(content) && (getOwner(content) == player))
+        {
             ++count;
+            if (canMove(i) || canCapture(i))
+            {
+                is_stuck = false;
+                break;
+            }
+        }
     }
-    if (count==0) return 1; else return 0;
+    if (count == 0 || is_stuck)
+        return true;
+
+    return false;
 }
 
 
@@ -70,7 +91,7 @@ Owner CheckersBoard::getOwner(int piece) const
 
 bool CheckersBoard::isMan(int piece) const
 {
-    return (piece>=BLACK_M)&&(piece<=WHITE_M);
+    return (piece>=BLACK_M) &&(piece<=WHITE_M);
 }
 
 bool CheckersBoard::canMove(int field) const
@@ -191,9 +212,9 @@ int CheckersBoard::makeMove(int player, int from, int to, int CAPTURE)
     int piece_from=board[ver[from]][hor[from]];
     int field_to=board[ver[to]][hor[to]];
 
-    if ((from<1)||(from>32))
+    if ((from<1) || (from>32))
         return 1; //from invalid feild
-    if ((to<1)||(to>32))
+    if ((to<1) || (to>32))
         return 2; //field to ivalid
     if ((!isPiece(piece_from)) || (getOwner(piece_from) != player))
         return 3; //no player's piece on 'from' field
@@ -206,23 +227,20 @@ int CheckersBoard::makeMove(int player, int from, int to, int CAPTURE)
     if (CAPTURE==1)
     {
         piece_mid=board[(ver[from]+ver[to])/2][(hor[from]+hor[to])/2];
-        if ((!isPiece(piece_mid))||(getOwner(piece_mid)!=getOpponent(player)))
+        if ((!isPiece(piece_mid)) || (getOwner(piece_mid) != getOpponent(player)))
             return 7; //no opponent's piece to between from and to
     }
     if (isMan(piece_from))
     {
-        if (((player==BLACK)&&((to-from)<3)) || ((player==WHITE)&&((from-to)<3))) //wrong direction
+        if (((player==BLACK)&&((to-from)<3)) || ((player==WHITE)&&((from-to)<3)))
             return 8; // wrong direction
     }
 
-    /* ok, ten ruch jest legalny, przynajmniej jako czesc dluzszej sekwencji
-       jeszcze moze sie okazac nielegalna cala sekwencja, jesli bicie moze
-       byc kontynuowane a nie jest
-       ale tutaj tego nie sprawdzamy
-       tu sprawdzamy i wykonujemy tylko ruch pojedynczy */
+    //for now move is legal
+
     result = 0;
     if (isMan(piece_from) && (((player==BLACK)&&(ver[to]==8)) || ((player==WHITE)&&(ver[to]==1))))
-        result += 100; /* promocja piona */
+        result += 100; /* man promotion */
 
     //executing move
     board[ver[to]][hor[to]] = board[ver[from]][hor[from]];
@@ -232,9 +250,9 @@ int CheckersBoard::makeMove(int player, int from, int to, int CAPTURE)
 
     if (CAPTURE==1)
     {
-        board[(ver[from]+ver[to])/2][(hor[from]+hor[to])/2] = EMPTY_F;
+        board[(ver[from] + ver[to])/2][(hor[from] + hor[to])/2] = EMPTY_F;
     }
-
+    lastMovedPieceType = board[ver[to]][hor[to]];
     return result;
 }
 
@@ -245,17 +263,17 @@ int CheckersBoard::getOpponent(int player) const
 
 void CheckersBoard::displayFields() const
 {
-    char buf[10];
     for (int i = 0; i < 10; ++i) {
         for (int j = 0; j < 10; ++j) {
-            // Format the current field value into buf
-            sprintf(buf, "%2d", fields[i][j]);
-
-            // Print the appropriate value based on the field content
-            fprintf(stderr, "%3s", fields[i][j] == -2 ? "**" : fields[i][j] == -1 ? "  " : buf);
+            if (fields[i][j] == -2) {
+                std::cout << std::setw(3) << "**";
+            } else if (fields[i][j] == -1) {
+                std::cout << std::setw(3) << " ";
+            } else {
+                std::cout << std::setw(3) << fields[i][j];
+            }
         }
-        // Print a newline at the end of each row
-        fprintf(stderr, "\n");
+        std::cout << std::endl;
     }
 }
 
@@ -268,3 +286,108 @@ int CheckersBoard::getHor(int index) const
 {
    return hor[index];
 }
+
+bool CheckersBoard::isManMoved() const {
+    return lastMovedPieceType == BLACK_M || lastMovedPieceType == WHITE_M;
+}
+
+int CheckersBoard::getFieldSymbol(int row, int col) const
+{
+    return board[row][col] - 50;
+}
+
+int CheckersBoard::getPieceAt(int field) const
+{
+
+    if (field < 1 || field > 32) {
+        return INVALID;  // Or another appropriate error value
+    }
+
+
+    int row = ver[field];
+    int col = hor[field];
+
+
+    return board[row][col];
+}
+
+std::vector<std::pair<int, int>> CheckersBoard::generateMoves(Owner player) const
+{
+    std::vector<std::pair<int, int>> moves;
+
+    for (int i = 1; i <= 32; ++i)
+    {
+        int piece = getPieceAt(i);
+        if (isPiece(piece) && getOwner(piece) == player) {
+            for (int j = 1; j <= 32; ++j) {
+                if (isLegalMove(player, i, j))
+                {
+                    moves.emplace_back(i, j);
+                }
+            }
+        }
+    }
+
+    return moves;
+}
+
+
+
+bool CheckersBoard::isLegalMove(int player, int from, int to) const
+{
+    int result;
+    int piece_mid; /* tylko przy biciu */
+    int piece_from=board[ver[from]][hor[from]];
+    int field_to=board[ver[to]][hor[to]];
+
+    int CAPTURE;
+    if (abs(getVer(from) - getVer(to)) == 2 && abs(getHor(from) - getHor(to)) == 2)
+        CAPTURE = 1;
+    else
+        CAPTURE = 0;
+
+    if ((from<1) || (from>32))
+        return false; //from invalid feild
+    if ((to<1) || (to>32))
+        return false; //field to ivalid
+    if ((!isPiece(piece_from)) || (getOwner(piece_from) != player))
+        return false; //no player's piece on 'from' field
+    if (field_to != EMPTY_F)
+        return false; //field 'to' is not empty
+    if ((CAPTURE==0)&&((abs(ver[from]-ver[to])!=1)||(abs(hor[from]-hor[to])!=1)))
+        return false; //wrong geometry of move
+    if ((CAPTURE==1)&&((abs(ver[from]-ver[to])!=2)||(abs(hor[from]-hor[to])!=2)))
+        return false; //wrong geometry of move
+    if (CAPTURE==1)
+    {
+        piece_mid=board[(ver[from]+ver[to])/2][(hor[from]+hor[to])/2];
+        if ((!isPiece(piece_mid)) || (getOwner(piece_mid) != getOpponent(player)))
+            return false; //no opponent's piece to between from and to
+    }
+    if (isMan(piece_from))
+    {
+        if (((player==BLACK)&&((to-from)<3)) || ((player==WHITE)&&((from-to)<3)))
+            return false; // wrong direction
+    }
+
+    bool captureRequired = false;
+    for (int i = 1; i <= 32; ++i) {
+        int piece = getPieceAt(i);
+        if (isPiece(piece) && getOwner(piece) == player)
+        {
+            if (canCapture(i)) {
+                captureRequired = true;
+                break;
+            }
+        }
+    }
+
+    if (captureRequired && CAPTURE == 0)
+    {
+        return false;
+    }
+
+    return true;
+
+}
+

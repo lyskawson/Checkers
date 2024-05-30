@@ -22,6 +22,7 @@ class CheckersBoard
     std::vector<int> hor;
     std::vector<int> ver;
     std::vector<std::vector<int>> fields;
+    int lastMovedPieceType;
 
 
 public:
@@ -40,6 +41,11 @@ public:
     void displayFields() const;
     int getVer(int field) const;
     int getHor(int field) const;
+    bool isManMoved() const; //checks if was man moved in last move
+    int getFieldSymbol(int row, int col) const;
+    int getPieceAt(int field) const;
+    std::vector<std::pair<int, int>> generateMoves(Owner player) const; //generate all possible moves for ai
+    bool isLegalMove(int player, int from, int to) const; //checks if move is legal
 
 };
 

@@ -14,7 +14,8 @@ std::unique_ptr<Player> Controller::createPlayer(PlayerType type, Owner color)
     if (type == PlayerType::Human)
     {
         return std::make_unique<HumanPlayer>(color, board);
-    } else
+    }
+    else
     {
         return std::make_unique<ComputerPlayer>(color, board);
     }
@@ -24,12 +25,44 @@ std::unique_ptr<Player> Controller::createPlayer(PlayerType type, Owner color)
 
 void Controller::playGame()
 {
-    while (1)
+    int drawCounter = 0;
+    int moveNum = 0;
+    const int drawLimit  = 40;
+    while (true)
     {
-        board.displayBoard();
-        blackPlayer->makeMove(board);
-        board.displayBoard();
-        whitePlayer->makeMove(board);
+        ++moveNum;
+        ++drawCounter;
+        if (drawCounter > drawLimit)
+        {
+            std::cerr << " Exceeded limit of moves by kings without progress - draw" << std::endl;
+            std::cout << "DRAW" << std::endl;
+            std::exit(40);  // exceeded limit of moves by kings without progress - draw
+        }
+        int player = moveNum%2;
+
+
+        if (player == 0)
+        {
+            whitePlayer->makeMove(board);
+        }
+        else
+        {
+            blackPlayer->makeMove(board);
+        }
+
+        if (board.isGameOver(1-player))
+        {
+            std::cout << "Winner: " << (player == 0 ? "White" : "Black") << std::endl;
+            std::exit(0);  // end the game
+        }
+
+        if (board.isManMoved())
+        {
+            drawCounter = 0;
+        }
+
     }
 
 }
+
+

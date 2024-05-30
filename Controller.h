@@ -19,8 +19,7 @@ private:
 public:
     Controller(CheckersBoard& board, PlayerType whiteType, PlayerType blackType);
     std::unique_ptr<Player> createPlayer(PlayerType type, Owner color);
-
-
     void playGame();
+    void playGameSFML(sf::Event &event);
 };
 #endif //CHECKERS_CONTROLLER_H
