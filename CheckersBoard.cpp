@@ -30,6 +30,7 @@ void CheckersBoard::restartBoard()
               { 57, 52, 56, 52, 56, 52, 56, 52, 56, 57 },
               { 57, 57, 57, 57, 57, 57, 57, 57, 57, 57 } };
 
+
     fields = {{ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 },
               { -2, -1,  1, -1,  2, -1,  3, -1,  4, -2 },
               { -2,  5, -1,  6, -1,  7, -1,  8, -1, -2 },
@@ -46,21 +47,56 @@ void CheckersBoard::restartBoard()
 
 }
 
-const char* symbols[] = {"!!!", " B ", " W ", "(B)", "(W)", "___", "   ", "***", "???"};
 
 void CheckersBoard::displayBoard() const
 {
-    for (int i = 0; i < 10; ++i)
+
+    const char EMPTY = ' ';
+    const char BLACK_MAN = 'b';
+    const char WHITE_MAN = 'w';
+    const char BLACK_KING = 'B';
+    const char WHITE_KING = 'W';
+
+    const char* RESET = "\033[0m";
+    const char* RED =  "\033[91m";
+    const char* BLUE = "\033[94m";
+
+
+
+    std::cout << "+----+----+----+----+----+----+----+----+\n";
+
+    for (int row = 1; row < 9; ++row)
     {
-        for (int j = 0; j < 10; ++j)
+        for (int col = 1; col < 9; ++col)
         {
-            std::cout << symbols[board[i][j] - 50];
+            int piece = board[row][col];
+            int field = fields[row][col];
+            char symbol = EMPTY;
+            const char* color = RESET;
+
+
+            if (piece == BLACK_M || piece == BLACK_K) {
+                symbol = (piece == BLACK_M) ? BLACK_MAN : BLACK_KING;
+                color = RED;
+            }
+            else if (piece == WHITE_M || piece == WHITE_K) {
+                symbol = (piece == WHITE_M) ? WHITE_MAN : WHITE_KING;
+                color = BLUE;
+            }
+
+            if (field > 0)
+                std::cout << "|" << std::setw(2) << field << " ";
+            else
+                std::cout << "|" << "  " << " ";
+            std::cout << color << std::setw(1) << symbol << RESET;
         }
-        std::cout << std::endl;
+        std::cout << "|";
+        std::cout << "\n+----+----+----+----+----+----+----+----+\n";
     }
 }
 
-bool CheckersBoard::isGameOver(int player) const {
+bool CheckersBoard::isGameOver(int player) const
+{
     int i, count = 0, content;
     bool is_stuck = true;
     for (i = 1; i <= 32; ++i)
@@ -99,7 +135,6 @@ bool CheckersBoard::canMove(int field) const
     int vert = ver[field];
     int horz = hor[field];
     int piece = board[vert][horz];
-
 
     // check for normal direction, man or king
     if (getOwner(piece)==BLACK) //check move down
@@ -223,7 +258,7 @@ int CheckersBoard::makeMove(int player, int from, int to, int CAPTURE)
     if ((CAPTURE==0)&&((abs(ver[from]-ver[to])!=1)||(abs(hor[from]-hor[to])!=1)))
         return 5; //wrong geometry of move
     if ((CAPTURE==1)&&((abs(ver[from]-ver[to])!=2)||(abs(hor[from]-hor[to])!=2)))
-        return 6; //wrong geometry of move
+        return 6; //wrong geometry of move for capture
     if (CAPTURE==1)
     {
         piece_mid=board[(ver[from]+ver[to])/2][(hor[from]+hor[to])/2];
@@ -261,22 +296,6 @@ int CheckersBoard::getOpponent(int player) const
     return 1-player;
 }
 
-void CheckersBoard::displayFields() const
-{
-    for (int i = 0; i < 10; ++i) {
-        for (int j = 0; j < 10; ++j) {
-            if (fields[i][j] == -2) {
-                std::cout << std::setw(3) << "**";
-            } else if (fields[i][j] == -1) {
-                std::cout << std::setw(3) << " ";
-            } else {
-                std::cout << std::setw(3) << fields[i][j];
-            }
-        }
-        std::cout << std::endl;
-    }
-}
-
 int CheckersBoard::getVer(int index) const
 {
     return ver[index];
@@ -287,20 +306,17 @@ int CheckersBoard::getHor(int index) const
    return hor[index];
 }
 
-bool CheckersBoard::isManMoved() const {
-    return lastMovedPieceType == BLACK_M || lastMovedPieceType == WHITE_M;
-}
-
-int CheckersBoard::getFieldSymbol(int row, int col) const
+bool CheckersBoard::isManMoved() const
 {
-    return board[row][col] - 50;
+    return lastMovedPieceType == BLACK_M || lastMovedPieceType == WHITE_M;
 }
 
 int CheckersBoard::getPieceAt(int field) const
 {
 
-    if (field < 1 || field > 32) {
-        return INVALID;  // Or another appropriate error value
+    if (field < 1 || field > 32)
+    {
+        return INVALID;
     }
 
 
@@ -311,15 +327,17 @@ int CheckersBoard::getPieceAt(int field) const
     return board[row][col];
 }
 
-std::vector<std::pair<int, int>> CheckersBoard::generateMoves(Owner player) const
+std::vector<std::pair<int, int>> CheckersBoard::generateMoves(int player) const
 {
     std::vector<std::pair<int, int>> moves;
 
     for (int i = 1; i <= 32; ++i)
     {
         int piece = getPieceAt(i);
-        if (isPiece(piece) && getOwner(piece) == player) {
-            for (int j = 1; j <= 32; ++j) {
+        if (isPiece(piece) && getOwner(piece) == player)
+        {
+            for (int j = 1; j <= 32; ++j)
+            {
                 if (isLegalMove(player, i, j))
                 {
                     moves.emplace_back(i, j);
@@ -335,8 +353,8 @@ std::vector<std::pair<int, int>> CheckersBoard::generateMoves(Owner player) cons
 
 bool CheckersBoard::isLegalMove(int player, int from, int to) const
 {
-    int result;
-    int piece_mid; /* tylko przy biciu */
+
+    int piece_mid;
     int piece_from=board[ver[from]][hor[from]];
     int field_to=board[ver[to]][hor[to]];
 
@@ -371,11 +389,13 @@ bool CheckersBoard::isLegalMove(int player, int from, int to) const
     }
 
     bool captureRequired = false;
-    for (int i = 1; i <= 32; ++i) {
+    for (int i = 1; i <= 32; ++i)
+    {
         int piece = getPieceAt(i);
         if (isPiece(piece) && getOwner(piece) == player)
         {
-            if (canCapture(i)) {
+            if (canCapture(i))
+            {
                 captureRequired = true;
                 break;
             }
@@ -390,4 +410,104 @@ bool CheckersBoard::isLegalMove(int player, int from, int to) const
     return true;
 
 }
+
+std::vector<int> CheckersBoard::splitNotation(const std::string& notation, char delimiter)
+{
+    std::vector<int> result;
+    std::stringstream ss(notation);
+    std::string item;
+    while (std::getline(ss, item, delimiter))
+    {
+        result.push_back(std::stoi(item));
+    }
+    return result;
+}
+
+bool CheckersBoard::makeMoveFromNotation(const std::string& notation, int player)
+{
+    std::vector<int> positions;
+
+
+    if (notation.find('x') != std::string::npos)
+    {
+        positions = splitNotation(notation, 'x');
+    }
+    else
+    {
+        positions = splitNotation(notation, '-');
+    }
+
+
+    for (size_t i = 0; i < positions.size() - 1; ++i)
+    {
+        int from = positions[i];
+        int to = positions[i + 1];
+        bool isCapture = (std::abs(getVer(from) - getVer(to)) == 2 && std::abs(getHor(from) - getHor(to)) == 2);
+
+
+
+        makeMove(player, from, to, isCapture);
+
+
+        if (isCapture)
+        {
+            int currentPos = to;
+            while (canCapture(currentPos))
+            {
+
+                std::vector<std::pair<int, int>> captureMoves = generateMoves(player);
+                if (!captureMoves.empty()) {
+
+                    int nextPos = captureMoves.front().second;
+                    makeMove(player, currentPos, nextPos, true);
+                    currentPos = nextPos;
+                } else
+                    break;
+
+            }
+        }
+    }
+
+    return true;
+}
+
+int CheckersBoard::getRow(int position) const
+{
+    return (position - 1) / 4 + 1;
+}
+
+int CheckersBoard::getCol(int position) const
+{
+    int row = getRow(position);
+    return (position - 1) % 4 * 2 + 1 + (row % 2);
+}
+
+void CheckersBoard::undoMove(int player, int from, int to, bool isCapture, const std::vector<int>& capturedPositions, const std::vector<int>& capturedPieces, int promotedPiece) {
+    // Move the piece back to its original position
+    board[ver[from]][hor[from]] = board[ver[to]][hor[to]];
+    board[ver[to]][hor[to]] = EMPTY_F;
+
+    // If the piece was promoted during the move, it should be demoted back to a regular piece
+    if (promotedPiece != -1) {
+        board[ver[from]][hor[from]] = promotedPiece;
+    }
+
+    // If it was a capture, restore the captured pieces
+    if (isCapture)
+    {
+        for (size_t i = 0; i < capturedPositions.size(); ++i) {
+            int capturePos = capturedPositions[i];
+            int captureVer = capturePos / 4;
+            int captureHor = capturePos % 4;
+            board[captureVer][captureHor] = capturedPieces[i];
+        }
+    }
+}
+void CheckersBoard::setPieceAt(int position, int piece)
+{
+    int row = getVer(position);
+    int col = getHor(position);
+    board[row][col] = piece;
+}
+
 

@@ -1,6 +1,10 @@
 #ifndef CHECKERSENGINE_CHECKERSBOARD_H
 #define CHECKERSENGINE_CHECKERSBOARD_H
 #include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <iostream>
 
 enum BoardState {
     BLACK_M = 51,
@@ -38,14 +42,19 @@ public:
     bool canCapture(int field) const; // checks if a piece in field can make a capture move
     bool isPiece(int piece) const;
     int getOpponent(int player) const;
-    void displayFields() const;
     int getVer(int field) const;
     int getHor(int field) const;
     bool isManMoved() const; //checks if was man moved in last move
-    int getFieldSymbol(int row, int col) const;
     int getPieceAt(int field) const;
-    std::vector<std::pair<int, int>> generateMoves(Owner player) const; //generate all possible moves for ai
+    std::vector<std::pair<int, int>> generateMoves(int player ) const; //generate all possible moves for ai
     bool isLegalMove(int player, int from, int to) const; //checks if move is legal
+    std::vector<int> splitNotation(const std::string& notation, char delimiter); //helper for makeMovefromNotation
+    bool makeMoveFromNotation(const std::string& notation, int player);
+    int getRow(int position) const;
+    void undoMove(int player, int from, int to, bool isCapture, const std::vector<int>& capturedPositions, const std::vector<int>& capturedPieces, int promotedPiece);
+    int getCol(int position) const;
+    void setPieceAt(int position, int piece);
+
 
 };
 

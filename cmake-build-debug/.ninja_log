@@ -1,0 +1,22 @@
+# ninja log v5
+4	978	1717884699310541305	CMakeFiles/Checkers.dir/View.cpp.o	6004f21f8d4d815
+8	514	1714750340311870125	CMakeFiles/Checkers.dir/AIPlayer.cpp.o	80c91d9a3373ce09
+3	547	1717953107790795816	CMakeFiles/Checkers.dir/HumanPlayer.cpp.o	32127e8269219422
+2	190	1716076301403704360	CMakeFiles/Checkers.dir/checkers_broker.cpp.o	4f79c6bb5e509a60
+5	585	1717932451681541435	CMakeFiles/Checkers.dir/TestComputer.cpp.o	88ae73922fb25111
+2	869	1718013386321054984	CMakeFiles/Checkers.dir/main.cpp.o	b54d7078ca9bbc08
+833	1396	1717884699734612258	CMakeFiles/Checkers.dir/SFMLPlayer.cpp.o	2e5b7f9ddbfc92c6
+13	152	1718288992415107676	build.ninja	3a13601d984414e7
+2	53	1717967986029755568	Checkers	1c8e0118c1a5da1e
+850	1402	1717884699731972310	CMakeFiles/Checkers.dir/SFMLController.cpp.o	cf2a103edff5121
+2	521	1717932634394388276	CMakeFiles/Checkers.dir/Controller.cpp.o	d86dd17c6bd053c1
+2	1051	1718013386504237180	CMakeFiles/Checkers.dir/ComputerPlayer.cpp.o	b39e427effe955e5
+2	1080	1718013386533977608	CMakeFiles/Checkers.dir/CheckersBoard.cpp.o	57b3ae638c561f42
+2	174	1716076301387126027	CMakeFiles/Checkers.dir/checkers_client.cpp.o	ecf82e41c9c6e2d5
+13	234	1717967543605212870	CMakeFiles/Checkers.dir/checkers_broker.c.o	e346103fdd529571
+10	94	1718288992415107676	build.ninja	3a13601d984414e7
+2	530	1718288992968885900	CMakeFiles/Checkers.dir/HumanPlayer.cpp.o	32127e8269219422
+2	582	1718288993018357908	CMakeFiles/Checkers.dir/CheckersBoard.cpp.o	17d5173f254dd3cf
+3	593	1718288993030074375	CMakeFiles/Checkers.dir/ComputerPlayer.cpp.o	9f8549b37f847b93
+5	307	1718289043176733937	CMakeFiles/Checkers.dir/main.cpp.o	d1f467f326a1f340
+308	357	1718289043227899386	Checkers	1c8e0118c1a5da1e

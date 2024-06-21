@@ -1,29 +1,31 @@
 #include "HumanPlayer.h"
+#include "Player.h"
 
 
-void HumanPlayer::makeMove(CheckersBoard& board)
+void HumanPlayer::makeMove(CheckersBoard& board, int depth, unsigned random_seed)
 {
+    std::vector<std::string> errorCodes = {"Move from invalid field", "Move to invalid field", "No player's piece on 'from' field", "Move to field is not empty", "Wrong geometry of move", "Wrong geometry of move"};
     int from, to;
     bool validMoveMade = false;
 
     while (!validMoveMade)
     {
         board.displayBoard();
-        board.displayFields();
-        std::cout << "Enter your move (format: from to, where positions range from 1 to 32): ";
+
+        std::cout << "Enter your move (format: from to, where positions range from 1 to 32): " << std::endl;
 
         if (!(std::cin >> from >> to)) {
-            std::cout << "Invalid input. Please enter numbers.\n";
+            std::cerr << "Invalid input. Please enter numbers.\n";
             std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            //std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
         }
 
 
 
-        if (from < 1 || from >= 32 || to < 1 || to >= 32) //change here form 0 to 1
+        if (from < 1 || from > 32 || to < 1 || to > 32) //change here form 0 to 1
         {
-            std::cout << "Positions must be between 1 and 32.\n";
+            std::cerr << "Positions must be between 1 and 32.\n";
             continue;
         }
 
@@ -41,20 +43,22 @@ void HumanPlayer::makeMove(CheckersBoard& board)
         int CAPTURE = (abs(board.getVer(from) - board.getVer(to)) == 2 && abs(board.getHor(from) - board.getHor(to)) == 2) ? 1 : 0;
 
         if (captureRequired && CAPTURE == 0) {
-            std::cout << "A capture move is mandatory. You must capture.\n";
+            std::cerr << "A capture move is mandatory. You must capture.\n";
             continue;
         }
 
 
         int moveResult = board.makeMove(color, from, to, CAPTURE);
-        if (moveResult != 0)
+        if (moveResult != 0 && moveResult != 100)
         {
-            std::cout << "Illegal move. Error code: " << moveResult << ". Please try again.\n";
+            std::cerr << "Illegal move. "<< errorCodes[moveResult-1] << ". Please try again.\n";
             continue;
         }
+        board.displayBoard();
+        bool wasPromoted = (moveResult == 100);
 
         // Check for additional captures
-        if (CAPTURE == 1 && board.canCapture(to))
+        if (CAPTURE == 1 && board.canCapture(to) && !wasPromoted)
         {
             std::cout << "You must continue capturing:\n";
             board.displayBoard();
